@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import "./globals.css"
+import "@/styles/globals.css"
 
 export const metadata: Metadata = {
   title: "HotCue Sounds",
@@ -12,17 +12,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="antialiased">
-        <div className="min-h-screen flex flex-col">
-          {/* Header placeholder */}
-          <main className="flex-grow">{children}</main>
-          {/* Footer placeholder */}
-          <footer className="p-4 border-t text-sm">
-            © {new Date().getFullYear()} HotCue Sounds
-          </footer>
-        </div>
+    <html lang="en" className="dark">
+      <body className="min-h-screen flex flex-col">
+        <main className="flex-1">
+          {children}
+        </main>
       </body>
     </html>
   )
 }
+
