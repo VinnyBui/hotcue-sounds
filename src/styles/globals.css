@@ -118,3 +118,62 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .products-row > *:nth-child(1) {
+    transform: perspective(1000px) rotateY(-30deg) translateY(60px);
+    transition: transform 0.3s ease-in-out;
+  }
+  .products-row > *:nth-child(1):hover {
+    transform: perspective(1000px) rotateY(-15deg) translateY(60px);
+  }
+
+  .products-row > *:nth-child(2) {
+    transform: perspective(1000px) rotateY(-30deg) translateY(50px);
+    transition: transform 0.3s ease-in-out;
+  }
+  .products-row > *:nth-child(2):hover {
+    transform: perspective(1000px) rotateY(-15deg) translateY(50px);
+  }
+
+  .products-row > *:nth-child(3) {
+    transform: perspective(1000px) rotateY(-30deg) translateY(40px);
+    transition: transform 0.3s ease-in-out;
+  }
+  .products-row > *:nth-child(3):hover {
+    transform: perspective(1000px) rotateY(-15deg) translateY(40px);
+  }
+
+  .products-row > *:nth-child(4) {
+    transform: perspective(1000px) rotateY(-30deg) translateY(30px);
+    transition: transform 0.3s ease-in-out;
+  }
+  .products-row > *:nth-child(4):hover {
+    transform: perspective(1000px) rotateY(-15deg) translateY(30px);
+  }
+
+  .products-row > *:nth-child(5) {
+    transform: perspective(1000px) rotateY(-30deg) translateY(20px);
+    transition: transform 0.3s ease-in-out;
+  }
+  .products-row > *:nth-child(5):hover {
+    transform: perspective(1000px) rotateY(-15deg) translateY(20px);
+  }
+
+  .products-row > *:nth-child(6) {
+    transform: perspective(1000px) rotateY(-30deg) translateY(10px);
+    transition: transform 0.3s ease-in-out;
+  }
+  .products-row > *:nth-child(6):hover {
+    transform: perspective(1000px) rotateY(-15deg) translateY(10px);
+  }
+
+  .products-row > *:nth-child(7) {
+    transform: perspective(1000px) rotateY(-30deg) translateY(0px);
+    transition: transform 0.3s ease-in-out;
+  }
+  .products-row > *:nth-child(7):hover {
+    transform: perspective(1000px) rotateY(-15deg) translateY(0px);
+  }
+}
+
