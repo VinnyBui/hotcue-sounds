@@ -7,7 +7,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ image, title }: ProductCardProps) {
   return (
-    <Card className="flex-shrink-0 p-0 w-[250px] h-[250px] bg-transparent">
+    <Card className="flex-shrink-0 p-0 max-w-[125px] max-h-[125px] md:max-w-[250px] md:max-h-[250px] bg-transparent border-0">
       <CardContent className="p-0 h-full">
         <img
           src={image}
@@ -15,7 +15,7 @@ export default function ProductCard({ image, title }: ProductCardProps) {
           className="w-full h-full object-cover"
         />
       </CardContent>
-      <CardFooter className="pl-4 text-white font-semibold">
+      <CardFooter className="p-0 text-white font-semibold text-xs md:text-lg flex justify-center">
         {title}
       </CardFooter>
     </Card>
