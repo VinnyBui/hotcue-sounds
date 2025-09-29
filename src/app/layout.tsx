@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
-import { ThemeProvider } from "next-themes"
+import NavBar from "@/components/NavBar"
 import "@/styles/globals.css"
+import { ThemeProviderWrapper } from "@/components/ThemeProviderWrapper"
 
 export const metadata: Metadata = {
   title: "HotCue Sounds",
@@ -15,9 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground transition-all duration-300">
-        <ThemeProvider attribute="class" enableSystem defaultTheme="system">
+        <ThemeProviderWrapper>
+          <NavBar />
           {children}
-        </ThemeProvider>
+        </ThemeProviderWrapper>
       </body>
     </html>
   )
