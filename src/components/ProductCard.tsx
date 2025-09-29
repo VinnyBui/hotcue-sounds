@@ -15,7 +15,7 @@ export default function ProductCard({ image, title }: ProductCardProps) {
           className="w-full h-full object-cover"
         />
       </CardContent>
-      <CardFooter className="p-0 text-white font-semibold text-xs md:text-lg flex justify-center">
+      <CardFooter className="p-0 font-semibold text-xs md:text-lg flex justify-center">
         {title}
       </CardFooter>
     </Card>
