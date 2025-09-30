@@ -9,7 +9,7 @@ const navItems = [
 
 export default function NavBar() {
   return (
-    <nav className="w-full p-4 flex justify-between items-center">
+    <nav className="mx-40 mt-4 p-4 flex justify-between items-center bg-transparent ">
       <Link href="/" className="text-lg font-bold">
         <h1>Hotcue Sounds</h1>
       </Link>

@@ -1,5 +1,4 @@
 "use client"
-import {useState, useEffect } from "react";
 import { motion } from "framer-motion"
 import ProductCard from "@/components/ProductCard"
 
