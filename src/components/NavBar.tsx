@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown, ShoppingCart, Search } from "lucide-react"
 import { Button } from "./ui/button"
+import { useState } from "react"
 
 export default function NavBar() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <nav className="mx-40 mt-4 p-4 flex justify-between items-center bg-transparent">
       {/* Left side: Logo + Divider + Nav */}
@@ -22,10 +24,10 @@ export default function NavBar() {
         {/* Divider */}
         <div className="h-6 w-px bg-foreground/30" />
         {/* Sounds dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center text-sm font-medium hover:text-primary transition-colors">
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+          <DropdownMenuTrigger className="flex items-center text-sm font-medium hover:text-primary transition-colors focus:outline-none">
             Sounds
-            <ChevronDown className="ml-1 h-4 w-4" />
+            <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isOpen ? "rotate-180" : "rotate-0"}`}/>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem asChild>
