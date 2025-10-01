@@ -15,7 +15,7 @@ export default function HeroSection() {
     <section className="h-[90vh] flex items-center justify-center overflow-x-hidden md:px-20">
       <div className="flex gap-25 flex-col md:flex-row">
       {products.map((p, i) => {
-        const translateY = 50 - i * 10
+        const translateY = 0 - i * 10
         return (
           <motion.div
             key={i}
