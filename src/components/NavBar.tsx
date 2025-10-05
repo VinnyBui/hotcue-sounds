@@ -18,11 +18,34 @@ import {
 } from "@/components/ui/navigation-menu"
 import { ChevronDown, ShoppingCart, Search, Menu } from "lucide-react"
 import { Button } from "./ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 export default function NavBar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    // Check auth state on mount and when storage changes
+    const checkAuthState = () => {
+      const token = localStorage.getItem("shopify_access_token")
+      setIsLoggedIn(!!token)
+    }
+
+    // Check on mount
+    checkAuthState()
+
+    // Listen for storage changes (works across tabs/windows)
+    window.addEventListener("storage", checkAuthState)
+
+    // Listen for custom auth events (for same-page updates)
+    window.addEventListener("authStateChanged", checkAuthState)
+
+    return () => {
+      window.removeEventListener("storage", checkAuthState)
+      window.removeEventListener("authStateChanged", checkAuthState)
+    }
+  }, [])
 
   return (
     <nav className="mx-4 md:mx-20 lg:mx-40 mt-4 p-4 flex justify-between items-center bg-transparent">
@@ -88,10 +111,20 @@ export default function NavBar() {
           <ShoppingCart className="h-5 w-5" />
         </button>
         
-        {/* Sign Up - Hidden on mobile */}
-        <Button className="hidden md:block bg-transparent text-foreground border">
-          Sign Up
-        </Button>
+        {/* Auth Button - Hidden on mobile */}
+        {isLoggedIn ? (
+          <Link href="/account">
+            <Button className="hidden md:block bg-transparent text-foreground border">
+              Account
+            </Button>
+          </Link>
+        ) : (
+          <Link href="/login">
+            <Button className="hidden md:block bg-transparent text-foreground border">
+              Login
+            </Button>
+          </Link>
+        )}
         
         {/* Theme Toggle - Hidden on small mobile */}
         <div className="hidden sm:block sm:flex">
