@@ -34,3 +34,103 @@ export async function shopifyFetch(
     throw error
   }
 }
+
+export interface ShopifyProduct {
+  id: string
+  title: string
+  handle: string
+  description: string
+  priceRange: {
+    minVariantPrice: {
+      amount: string
+      currencyCode: string
+    }
+  }
+  images: {
+    edges: Array<{
+      node: {
+        url: string
+        altText: string | null
+      }
+    }>
+  }
+}
+
+export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]> {
+  const query = `
+    query GetProducts($limit: Int!) {
+      products(first: $limit) {
+        edges {
+          node {
+            id
+            title
+            handle
+            description
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            images(first: 2) {
+              edges {
+                node {
+                  url
+                  altText
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+
+  const data = await shopifyFetch(query, { limit })
+  return data.products.edges.map((edge: any) => edge.node)
+}
+
+export async function getProductsByCollection(
+  collectionHandle: string,
+  limit: number = 10
+): Promise<ShopifyProduct[]> {
+  const query = `
+    query GetCollectionProducts($handle: String!, $limit: Int!) {
+      collectionByHandle(handle: $handle) {
+        products(first: $limit) {
+          edges {
+            node {
+              id
+              title
+              handle
+              description
+              priceRange {
+                minVariantPrice {
+                  amount
+                  currencyCode
+                }
+              }
+              images(first: 2) {
+                edges {
+                  node {
+                    url
+                    altText
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+
+  const data = await shopifyFetch(query, { handle: collectionHandle, limit })
+
+  // Handle case where collection doesn't exist
+  if (!data.collectionByHandle) {
+    return []
+  }
+
+  return data.collectionByHandle.products.edges.map((edge: any) => edge.node)
+}

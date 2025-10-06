@@ -3,11 +3,10 @@ import { motion } from "framer-motion"
 import ProductCard from "@/components/ProductCard"
 
 const products = [
-  { image: "/images/soundpacks.png", title: "Lo-Fi Pack" },
+  { image: "/images/house.png", title: "Lo-Fi Pack" },
   { image: "/images/soundpacks.png", title: "Samples" },
   { image: "/images/soundpacks.png", title: "Synths" },
   { image: "/images/soundpacks.png", title: "FX" },
-  // { image: "/images/soundpacks.png", title: "MIDI Packs" },
 ]
 
 export default function HeroSection() {
