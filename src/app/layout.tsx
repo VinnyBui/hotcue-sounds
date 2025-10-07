@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
-import NavBar from "@/components/NavBar"
+import { NavBar } from "@/components/layout"
 import "@/styles/globals.css"
-import { ThemeProviderWrapper } from "@/components/ThemeProviderWrapper"
+import { ThemeProviderWrapper } from "@/components/providers"
 
 export const metadata: Metadata = {
   title: "HotCue Sounds",

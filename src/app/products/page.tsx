@@ -1,5 +1,5 @@
 import { getProducts } from "@/lib/shopify"
-import ProductGrid from "@/components/ProductGrid"
+import { ProductGrid } from "@/components/products"
 
 export default async function ProductsPage() {
   const products = await getProducts(50) // Get up to 50 products

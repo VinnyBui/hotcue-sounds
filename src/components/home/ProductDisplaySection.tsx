@@ -1,5 +1,5 @@
 import { getProducts, ShopifyProduct } from "@/lib/shopify"
-import ProductDisplayClient from "@/components/ProductDisplayClient"
+import { ProductDisplayClient } from "@/components/products"
 
 export default async function ProductDisplaySection() {
   let products: ShopifyProduct[] = []

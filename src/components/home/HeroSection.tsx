@@ -1,6 +1,6 @@
 "use client"
 import { motion } from "framer-motion"
-import ProductCard from "@/components/ProductCard"
+import { ProductCard } from "@/components/products"
 
 const products = [
   { image: "/images/house.png", title: "Lo-Fi Pack" },

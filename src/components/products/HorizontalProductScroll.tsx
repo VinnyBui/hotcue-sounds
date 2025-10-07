@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import ProductCard from "@/components/ProductCard"
+import ProductCard from "@/components/products/ProductCard"
 import { ShopifyProduct } from "@/lib/shopify"
 import { useRef, useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"

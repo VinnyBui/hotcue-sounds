@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import CategoryFilterButtons, { Category } from "@/components/CategoryFilterButtons"
-import HorizontalProductScroll from "@/components/HorizontalProductScroll"
+import CategoryFilterButtons, { Category } from "@/components/products/CategoryFilterButtons"
+import HorizontalProductScroll from "@/components/products/HorizontalProductScroll"
 import { ShopifyProduct } from "@/lib/shopify"
 
 interface ProductDisplayClientProps {

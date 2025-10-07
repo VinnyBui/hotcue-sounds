@@ -17,7 +17,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 import { ChevronDown, ShoppingCart, Search, Menu } from "lucide-react"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
@@ -67,17 +67,23 @@ export default function NavBar() {
                 <NavigationMenuTrigger>Sounds</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid md:w-[400px] lg:w-[500px] lg:grid-cols-2">
-                    <ListItem href="/sounds/lofi" title="Lo-Fi">
-                      Chill beats and atmospheric sounds for laid-back productions
+                    <ListItem href="/products" title="All Sounds">
+                      Browse all sound packs and samples
                     </ListItem>
-                    <ListItem href="/sounds/synths" title="Synths">
-                      Analog and digital synth presets for any genre
+                    <ListItem href="/collections/house" title="House">
+                      House music samples and loops
                     </ListItem>
-                    <ListItem href="/sounds/fx" title="FX">
-                      Sound effects, transitions, and audio embellishments
+                    <ListItem href="/collections/techno" title="Techno">
+                      Techno drums, loops, and FX
                     </ListItem>
-                    <ListItem href="/sounds/midi" title="MIDI Packs">
-                      Ready-to-use MIDI patterns and chord progressions
+                    <ListItem href="/collections/bass" title="Bass">
+                      Bass House and Drum & Bass sounds
+                    </ListItem>
+                    <ListItem href="/collections/breaks" title="Breaks">
+                      Breakbeat, drum breaks, and percussion
+                    </ListItem>
+                    <ListItem href="/collections/fx" title="FX">
+                      Sound effects, risers, impacts, and transitions
                     </ListItem>
                   </ul>
                 </NavigationMenuContent>
@@ -127,7 +133,7 @@ export default function NavBar() {
         )}
         
         {/* Theme Toggle - Hidden on small mobile */}
-        <div className="hidden sm:block sm:flex">
+        <div className="hidden sm:flex">
           <ThemeToggle />
         </div>
 
