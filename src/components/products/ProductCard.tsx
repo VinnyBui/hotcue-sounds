@@ -1,28 +1,74 @@
+"use client"
+
 import {Card, CardContent, CardFooter} from '@/components/ui/card'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
+import { useState, useEffect } from 'react'
 
 interface ProductCardProps {
-  image: string
+  image?: string
+  images?: Array<{ url: string }>
   title: string
   price?: string
   handle?: string
-  variant?: 'hero' | 'grid'
+  variant?: 'hero' | 'grid' | 'detail'
 }
 
 export default function ProductCard({
   image,
+  images,
   title,
   price,
   handle,
   variant = 'hero'
 }: ProductCardProps) {
+  const { theme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // Prevent hydration mismatch by only rendering theme-dependent content after mount
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Determine which image to use based on theme
+  let displayImage: string
+
+  if (images && images.length > 0) {
+    // If images array is provided, use theme-aware selection
+    const darkImage = images[0]?.url || '/images/soundpacks.png'
+    const lightImage = images[1]?.url || darkImage // Fallback to first image if no second image
+
+    // Use first image during SSR, then switch based on theme after mount
+    displayImage = !mounted ? darkImage : (theme === 'dark' ? darkImage : lightImage)
+  } else if (image) {
+    // Backwards compatibility: use single image if provided
+    displayImage = image
+  } else {
+    // Fallback if neither is provided
+    displayImage = '/images/soundpacks.png'
+  }
+  // Detail variant (used in product detail page - circular without footer)
+  if (variant === 'detail') {
+    return (
+      <Card className="flex-shrink-0 p-0 max-w-[250px] max-h-[250px] md:max-w-[350px] md:max-h-[350px] bg-transparent border-2 border-border rounded-full">
+        <CardContent className="p-0 h-full">
+          <img
+            src={displayImage}
+            alt={title}
+            className="w-full h-full object-cover rounded-full"
+          />
+        </CardContent>
+      </Card>
+    )
+  }
+
   // Hero variant (used in HeroSection with 3D perspective)
   if (variant === 'hero') {
     return (
       <Card className="flex-shrink-0 p-0 max-w-[125px] max-h-[125px] md:max-w-[250px] md:max-h-[250px] bg-transparent border-2 border-border rounded-full ">
         <CardContent className="p-0 h-full">
           <img
-            src={image}
+            src={displayImage}
             alt={title}
             className="w-full h-full object-cover"
           />
@@ -40,7 +86,7 @@ export default function ProductCard({
       <CardContent className="p-0">
         <div className="aspect-square overflow-hidden">
           <img
-            src={image}
+            src={displayImage}
             alt={title}
             className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
           />

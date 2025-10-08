@@ -90,10 +90,7 @@ export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]>
   return data.products.edges.map((edge: any) => edge.node)
 }
 
-export async function getProductsByCollection(
-  collectionHandle: string,
-  limit: number = 10
-): Promise<ShopifyProduct[]> {
+export async function getProductsByCollection(collectionHandle: string, limit: number = 10): Promise<ShopifyProduct[]> {
   const query = `
     query GetCollectionProducts($handle: String!, $limit: Int!) {
       collectionByHandle(handle: $handle) {
@@ -133,4 +130,39 @@ export async function getProductsByCollection(
   }
 
   return data.collectionByHandle.products.edges.map((edge: any) => edge.node)
+}
+
+export async function getProductsByHandle(handle: string) : Promise<ShopifyProduct | null> {
+  const query = `
+    query getProductByHandle($handle: String!) {
+      productByHandle(handle: $handle) {
+        id
+        title
+        handle
+        description
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+        images(first: 2) {
+          edges {
+            node {
+              url
+              altText
+            }
+          }
+        }
+      }
+    }
+  `
+
+  const data = await shopifyFetch(query, { handle })
+
+  if (!data.productByHandle) {
+    return null
+  }
+
+  return data.productByHandle
 }

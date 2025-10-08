@@ -3,9 +3,8 @@
 import { motion } from "framer-motion"
 import ProductCard from "@/components/products/ProductCard"
 import { ShopifyProduct } from "@/lib/shopify"
-import { useRef, useState, useEffect } from "react"
+import { useRef } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useTheme } from "next-themes"
 
 interface HorizontalProductScrollProps {
   products: ShopifyProduct[]
@@ -13,13 +12,6 @@ interface HorizontalProductScrollProps {
 
 export default function HorizontalProductScroll({ products }: HorizontalProductScrollProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const { theme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  // Prevent hydration mismatch by only rendering theme-dependent content after mount
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   // Helper function to format price
   const formatPrice = (amount: string, currencyCode: string) => {
@@ -59,13 +51,8 @@ export default function HorizontalProductScroll({ products }: HorizontalProductS
         }}
       >
         {products.map((product, index) => {
-          // Get the appropriate image based on theme
-          // First image (index 0) for dark mode, second image (index 1) for light mode
-          const darkImage = product.images.edges[0]?.node.url || '/images/soundpacks.png'
-          const lightImage = product.images.edges[1]?.node.url || darkImage // Fallback to first image if no second image
-
-          // Use first image during SSR, then switch based on theme after mount
-          const image = !mounted ? darkImage : (theme === 'dark' ? darkImage : lightImage)
+          // Convert Shopify images format to simple array for ProductCard
+          const images = product.images.edges.map(edge => ({ url: edge.node.url }))
 
           const price = formatPrice(
             product.priceRange.minVariantPrice.amount,
@@ -83,7 +70,7 @@ export default function HorizontalProductScroll({ products }: HorizontalProductS
             >
               <ProductCard
                 variant="grid"
-                image={image}
+                images={images}
                 title={product.title}
                 price={price}
                 handle={product.handle}

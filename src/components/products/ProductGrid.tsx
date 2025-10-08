@@ -21,7 +21,8 @@ export default function ProductGrid({ products }: ProductGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       {products.map((product, index) => {
-        const image = product.images.edges[0]?.node.url || '/images/house.png'
+        // Convert Shopify images format to simple array for ProductCard
+        const images = product.images.edges.map(edge => ({ url: edge.node.url }))
         const price = formatPrice(
           product.priceRange.minVariantPrice.amount,
           product.priceRange.minVariantPrice.currencyCode
@@ -37,7 +38,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
           >
             <ProductCard
               variant="grid"
-              image={image}
+              images={images}
               title={product.title}
               price={price}
               handle={product.handle}
