@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ProductCard } from "@/components/products"
+import { ProductCard, AudioDrawer } from "@/components/products"
 import { ShopifyProduct } from "@/lib/shopify"
 
 interface ProductDetailClientProps {
@@ -27,11 +27,20 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <p className="text-muted-foreground text-md">
             {product.description}
           </p>
+          {product.audioPreviewUrl && (
+            <div className="flex justify-center md:justify-start">
+              <AudioDrawer
+                audioUrl={product.audioPreviewUrl}
+                productTitle={product.title}
+                variant="detail"
+                size="lg"
+              />
+            </div>
+          )}
         </motion.div>
 
-        {/* Right side - Hero card (spinning like a record) */}
+        {/* Right side - Spinning record */}
         <motion.div
-          className="flex flex-col justify-center items-center"
           initial={{ opacity: 0, x: 50 }}
           animate={{
             opacity: 1,

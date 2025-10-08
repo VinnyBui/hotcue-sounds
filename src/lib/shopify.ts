@@ -54,6 +54,7 @@ export interface ShopifyProduct {
       }
     }>
   }
+  audioPreviewUrl?: string
 }
 
 export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]> {
@@ -80,6 +81,13 @@ export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]>
                 }
               }
             }
+            previewAudio: metafield(namespace: "custom", key: "preview_audio_url") {
+              reference {
+                ... on GenericFile {
+                  url
+                }
+              }
+            }
           }
         }
       }
@@ -87,7 +95,10 @@ export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]>
   `
 
   const data = await shopifyFetch(query, { limit })
-  return data.products.edges.map((edge: any) => edge.node)
+  return data.products.edges.map((edge: any) => ({
+    ...edge.node,
+    audioPreviewUrl: edge.node.previewAudio?.reference?.url
+  }))
 }
 
 export async function getProductsByCollection(collectionHandle: string, limit: number = 10): Promise<ShopifyProduct[]> {
@@ -115,6 +126,13 @@ export async function getProductsByCollection(collectionHandle: string, limit: n
                   }
                 }
               }
+              previewAudio: metafield(namespace: "custom", key: "preview_audio_url") {
+                reference {
+                  ... on GenericFile {
+                    url
+                  }
+                }
+              }
             }
           }
         }
@@ -129,7 +147,10 @@ export async function getProductsByCollection(collectionHandle: string, limit: n
     return []
   }
 
-  return data.collectionByHandle.products.edges.map((edge: any) => edge.node)
+  return data.collectionByHandle.products.edges.map((edge: any) => ({
+    ...edge.node,
+    audioPreviewUrl: edge.node.previewAudio?.reference?.url
+  }))
 }
 
 export async function getProductsByHandle(handle: string) : Promise<ShopifyProduct | null> {
@@ -154,6 +175,13 @@ export async function getProductsByHandle(handle: string) : Promise<ShopifyProdu
             }
           }
         }
+        previewAudio: metafield(namespace: "custom", key: "preview_audio_url") {
+          reference {
+            ... on GenericFile {
+              url
+            }
+          }
+        }
       }
     }
   `
@@ -164,5 +192,8 @@ export async function getProductsByHandle(handle: string) : Promise<ShopifyProdu
     return null
   }
 
-  return data.productByHandle
+  return {
+    ...data.productByHandle,
+    audioPreviewUrl: data.productByHandle.previewAudio?.reference?.url
+  }
 }

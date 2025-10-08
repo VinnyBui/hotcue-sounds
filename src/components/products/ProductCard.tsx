@@ -4,6 +4,7 @@ import {Card, CardContent, CardFooter} from '@/components/ui/card'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { useState, useEffect } from 'react'
+import AudioDrawer from './AudioDrawer'
 
 interface ProductCardProps {
   image?: string
@@ -12,6 +13,7 @@ interface ProductCardProps {
   price?: string
   handle?: string
   variant?: 'hero' | 'grid' | 'detail'
+  audioPreviewUrl?: string
 }
 
 export default function ProductCard({
@@ -20,7 +22,8 @@ export default function ProductCard({
   title,
   price,
   handle,
-  variant = 'hero'
+  variant = 'hero',
+  audioPreviewUrl
 }: ProductCardProps) {
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -83,7 +86,7 @@ export default function ProductCard({
   // Grid variant (used in ProductDisplaySection with links and prices)
   const cardContent = (
     <Card className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 ">
-      <CardContent className="p-0">
+      <CardContent className="p-0 relative">
         <div className="aspect-square overflow-hidden">
           <img
             src={displayImage}
@@ -91,6 +94,16 @@ export default function ProductCard({
             className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
           />
         </div>
+        {audioPreviewUrl && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+            <AudioDrawer
+              audioUrl={audioPreviewUrl}
+              productTitle={title}
+              variant="grid"
+              size="md"
+            />
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex flex-col items-start p-4 gap-2">
         <h3 className="font-semibold text-base md:text-lg line-clamp-2">
