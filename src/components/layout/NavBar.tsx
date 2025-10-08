@@ -5,6 +5,7 @@ import Link from "next/link"
 import {
   Sheet,
   SheetTitle,
+  SheetDescription,
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
@@ -16,7 +17,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
-import { ChevronDown, ShoppingCart, Search, Menu } from "lucide-react"
+import { ChevronDown, ShoppingCart, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
@@ -107,11 +108,6 @@ export default function NavBar() {
 
       {/* Right side: Actions */}
       <div className="flex items-center space-x-2 md:space-x-4">
-        {/* Search - Hidden on small mobile */}
-        <button className="hidden sm:block p-2 hover:text-primary transition-colors">
-          <Search className="h-5 w-5" />
-        </button>
-        
         {/* Cart */}
         <button className="p-2 hover:text-primary transition-colors">
           <ShoppingCart className="h-5 w-5" />
@@ -146,11 +142,83 @@ export default function NavBar() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[250px] sm:w-[350px]">
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetDescription className="sr-only">
+              Access navigation links and theme settings
+            </SheetDescription>
             <div className="flex flex-col space-y-8 mt-8 px-4">
               {/* Mobile Navigation Links */}
               <div className="flex flex-col space-y-3">
                 <h2 className="text-lg font-bold">Navigation</h2>
-                
+
+                {/* Sounds Submenu */}
+                <div className="flex flex-col space-y-2">
+                  <button
+                    className="text-sm font-medium flex items-center justify-between hover:text-primary transition-colors"
+                    onClick={() => {
+                      const submenu = document.getElementById('mobile-sounds-submenu')
+                      const chevron = document.getElementById('mobile-sounds-chevron')
+                      if (submenu && chevron) {
+                        submenu.classList.toggle('hidden')
+                        chevron.classList.toggle('rotate-180')
+                      }
+                    }}
+                  >
+                    Sounds
+                    <ChevronDown id="mobile-sounds-chevron" className="h-4 w-4 transition-transform" />
+                  </button>
+                  <div id="mobile-sounds-submenu" className="hidden [&:not(.hidden)]:grid grid-cols-1 gap-2 pl-4">
+                    <Link
+                      href="/products"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      All Sounds
+                    </Link>
+                    <Link
+                      href="/collections/house"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      House
+                    </Link>
+                    <Link
+                      href="/collections/techno"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Techno
+                    </Link>
+                    <Link
+                      href="/collections/bass"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Bass
+                    </Link>
+                    <Link
+                      href="/collections/breaks"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Breaks
+                    </Link>
+                    <Link
+                      href="/collections/fx"
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      FX
+                    </Link>
+                  </div>
+                </div>
+
+                <Link
+                  href="/about"
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  About
+                </Link>
               </div>
 
               {/* Centered Divider - 50% width */}
@@ -160,6 +228,26 @@ export default function NavBar() {
 
               {/* Mobile Actions */}
               <div className="flex flex-col space-y-3">
+                {/* Auth Button */}
+                {isLoggedIn ? (
+                  <Link
+                    href="/account"
+                    className="flex items-center justify-start gap-4 text-sm hover:text-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="text-sm font-medium">Account</span>
+                  </Link>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex items-center justify-start gap-4 text-sm hover:text-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="text-sm font-medium">Login</span>
+                  </Link>
+                )}
+
+                {/* Theme Toggle */}
                 <div className="flex items-center justify-start gap-4">
                   <span className="text-sm font-medium">Theme</span>
                   <ThemeToggle />
