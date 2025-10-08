@@ -19,7 +19,7 @@ export default function ProductCard({
   // Hero variant (used in HeroSection with 3D perspective)
   if (variant === 'hero') {
     return (
-      <Card className="flex-shrink-0 p-0 max-w-[125px] max-h-[125px] md:max-w-[250px] md:max-h-[250px] bg-transparent border-2 border-border rounded-lg">
+      <Card className="flex-shrink-0 p-0 max-w-[125px] max-h-[125px] md:max-w-[250px] md:max-h-[250px] bg-transparent border-2 border-border rounded-full ">
         <CardContent className="p-0 h-full">
           <img
             src={image}
