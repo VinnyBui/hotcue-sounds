@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { ProductCard, AudioDrawer } from "@/components/products"
 import { ShopifyProduct } from "@/lib/shopify"
+import { Button } from "@/components/ui/button"
 
 interface ProductDetailClientProps {
   product: ShopifyProduct
@@ -27,16 +28,21 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <p className="text-muted-foreground text-md">
             {product.description}
           </p>
-          {product.audioPreviewUrl && (
-            <div className="flex justify-center md:justify-start">
-              <AudioDrawer
-                audioUrl={product.audioPreviewUrl}
-                productTitle={product.title}
-                variant="detail"
-                size="lg"
-              />
-            </div>
-          )}
+          <div className="flex gap-5 justify-center md:justify-start">
+            {product.audioPreviewUrl && (
+              <div className="flex justify-center md:justify-start">
+                <AudioDrawer
+                  audioUrl={product.audioPreviewUrl}
+                  productTitle={product.title}
+                  variant="detail"
+                  size="lg"
+                />
+              </div>
+            )}
+            <Button className="px-4 py-6 text-base" >
+              Add to Cart
+            </Button>
+          </div>
         </motion.div>
 
         {/* Right side - Spinning record */}
