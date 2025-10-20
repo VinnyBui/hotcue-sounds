@@ -35,6 +35,17 @@ export async function shopifyFetch(
   }
 }
 
+export interface ShopifyProductVariant {
+  id: string                    // "gid://shopify/ProductVariant/123"
+  title: string                 // "Default Title" or "Large / Red"
+  price: {
+    amount: string              // "24.99"
+    currencyCode: string        // "USD"
+  }
+  availableForSale: boolean     // true/false
+  quantityAvailable?: number    // Stock level (optional)
+}
+
 export interface ShopifyProduct {
   id: string
   title: string
@@ -54,8 +65,82 @@ export interface ShopifyProduct {
       }
     }>
   }
+  variants: {
+  edges: Array<{
+    node: ShopifyProductVariant
+  }>
+}
   audioPreviewUrl?: string
 }
+
+// ===== CART TYPES =====
+
+export interface CartLineInput {
+  merchandiseId: string  // ProductVariant ID
+  quantity: number
+  attributes?: Array<{ 
+    key: string; 
+    value: string 
+  }>
+}
+
+export interface ShopifyCartLine {
+  id: string
+  quantity: number
+  merchandise: {
+    id: string
+    title: string
+    price: {
+      amount: string
+      currencyCode: string
+    }
+    product: {
+      id: string
+      title: string
+      handle: string
+      images: {
+        edges: Array<{
+          node: {
+            url: string
+            altText: string | null
+          }
+        }>
+      }
+    }
+  }
+}
+
+export interface ShopifyCart {
+  id: string
+  checkoutUrl: string
+  totalQuantity: number
+  lines: {
+    edges: Array<{
+      node: ShopifyCartLine
+    }>
+  }
+  cost: {
+    totalAmount: {
+      amount: string
+      currencyCode: string
+    }
+    subtotalAmount: {
+      amount: string
+      currencyCode: string
+    }
+    totalTaxAmount?: {
+      amount: string
+      currencyCode: string
+    }
+  }
+}
+
+export interface CartUserError {
+  field: string[]
+  message: string
+}
+
+// ===== PRODUCT FUNCTIONS =====
 
 export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]> {
   const query = `
@@ -78,6 +163,20 @@ export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]>
                 node {
                   url
                   altText
+                }
+              }
+            }
+            variants(first: 10) {
+              edges {
+                node {
+                  id
+                  title
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  availableForSale
+                  quantityAvailable
                 }
               }
             }
@@ -123,6 +222,20 @@ export async function getProductsByCollection(collectionHandle: string, limit: n
                   node {
                     url
                     altText
+                  }
+                }
+              }
+              variants(first: 10) {
+                edges {
+                  node {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    availableForSale
+                    quantityAvailable
                   }
                 }
               }
@@ -175,6 +288,20 @@ export async function getProductsByHandle(handle: string) : Promise<ShopifyProdu
             }
           }
         }
+        variants(first: 10) {
+          edges {
+            node {
+              id
+              title
+              price {
+                amount
+                currencyCode
+              }
+              availableForSale
+              quantityAvailable
+            }
+          }
+        }
         previewAudio: metafield(namespace: "custom", key: "preview_audio_url") {
           reference {
             ... on GenericFile {
@@ -196,4 +323,389 @@ export async function getProductsByHandle(handle: string) : Promise<ShopifyProdu
     ...data.productByHandle,
     audioPreviewUrl: data.productByHandle.previewAudio?.reference?.url
   }
+}
+
+// ===== CART FUNCTIONS =====
+
+export async function createCart(lines?: CartLineInput[]): Promise<ShopifyCart> {
+  const query = `
+    mutation cartCreate($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    product {
+                      id
+                      title
+                      handle
+                      images(first: 2) {
+                        edges {
+                          node {
+                            url
+                            altText
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+            subtotalAmount {
+              amount
+              currencyCode
+            }
+            totalTaxAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `
+
+  const variables = { input: lines ? { lines } : {} }
+  const data = await shopifyFetch(query, variables)
+
+  if (data.cartCreate.userErrors?.length > 0) {
+    throw new Error(data.cartCreate.userErrors[0].message)
+  }
+
+  return data.cartCreate.cart
+}
+
+export async function getCart(cartId: string): Promise<ShopifyCart | null> {
+  const query = `
+    query getCart($cartId: ID!) {
+      cart(id: $cartId) {
+        id
+        checkoutUrl
+        totalQuantity
+        lines(first: 50) {
+          edges {
+            node {
+              id
+              quantity
+              merchandise {
+                ... on ProductVariant {
+                  id
+                  title
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  product {
+                    id
+                    title
+                    handle
+                    images(first: 2) {
+                      edges {
+                        node {
+                          url
+                          altText
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        cost {
+          totalAmount {
+            amount
+            currencyCode
+          }
+          subtotalAmount {
+            amount
+            currencyCode
+          }
+          totalTaxAmount {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  `
+
+  const data = await shopifyFetch(query, { cartId })
+
+  // Cart might not exist (expired or invalid ID)
+  if (!data.cart) {
+    return null
+  }
+
+  return data.cart
+}
+
+export async function addToCart(cartId: string, variantId: string, quantity: number): Promise<ShopifyCart> {
+  const query = `
+    mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!){
+      cartLinesAdd(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    product {
+                      id
+                      title
+                      handle
+                      images(first: 2) {
+                        edges {
+                          node {
+                            url
+                            altText
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+            subtotalAmount {
+              amount
+              currencyCode
+            }
+            totalTaxAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `
+
+  const variables = {
+    cartId,
+    lines: [
+      {
+        merchandiseId: variantId,
+        quantity
+      }
+    ]
+  }
+
+  const data = await shopifyFetch(query, variables)
+
+  if (data.cartLinesAdd.userErrors?.length > 0) {
+    throw new Error(data.cartLinesAdd.userErrors[0].message)
+  }
+
+  return data.cartLinesAdd.cart
+}
+
+export async function updateCartLine(
+  cartId: string,
+  lineId: string,
+  quantity: number
+): Promise<ShopifyCart> {
+  const query = `
+    mutation updateCartLine($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+      cartLinesUpdate(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    product {
+                      id
+                      title
+                      handle
+                      images(first: 2) {
+                        edges {
+                          node {
+                            url
+                            altText
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+            subtotalAmount {
+              amount
+              currencyCode
+            }
+            totalTaxAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `
+
+  const variables = {
+    cartId,
+    lines: [
+      {
+        id: lineId,
+        quantity
+      }
+    ]
+  }
+
+  const data = await shopifyFetch(query, variables)
+
+  if (data.cartLinesUpdate.userErrors?.length > 0) {
+    throw new Error(data.cartLinesUpdate.userErrors[0].message)
+  }
+
+  return data.cartLinesUpdate.cart
+}
+
+export async function removeFromCart(
+  cartId: string,
+  lineIds: string[]
+): Promise<ShopifyCart> {
+  const query = `
+    mutation removeFromCart($cartId: ID!, $lineIds: [ID!]!) {
+      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    product {
+                      id
+                      title
+                      handle
+                      images(first: 2) {
+                        edges {
+                          node {
+                            url
+                            altText
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+            subtotalAmount {
+              amount
+              currencyCode
+            }
+            totalTaxAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `
+
+  const variables = {
+    cartId,
+    lineIds
+  }
+
+  const data = await shopifyFetch(query, variables)
+
+  if (data.cartLinesRemove.userErrors?.length > 0) {
+    throw new Error(data.cartLinesRemove.userErrors[0].message)
+  }
+
+  return data.cartLinesRemove.cart
 }

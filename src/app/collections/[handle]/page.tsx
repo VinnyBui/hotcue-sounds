@@ -25,7 +25,7 @@ const collectionDescriptions: Record<string, string> = {
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
-  const { handle } = params
+  const { handle } = await params
 
   let products: ShopifyProduct[] = []
   let error: string | null = null

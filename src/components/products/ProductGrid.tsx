@@ -27,6 +27,8 @@ export default function ProductGrid({ products }: ProductGridProps) {
           product.priceRange.minVariantPrice.amount,
           product.priceRange.minVariantPrice.currencyCode
         )
+        // Get the first available variant ID for add to cart functionality
+        const variantId = product.variants.edges[0]?.node.id
 
         return (
           <motion.div
@@ -42,6 +44,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
               title={product.title}
               price={price}
               handle={product.handle}
+              variantId={variantId}
             />
           </motion.div>
         )

@@ -4,6 +4,8 @@ import { motion } from "framer-motion"
 import { ProductCard, AudioDrawer } from "@/components/products"
 import { ShopifyProduct } from "@/lib/shopify"
 import { Button } from "@/components/ui/button"
+import { useCartStore } from "@/store/cartStore"
+import { useState } from "react"
 
 interface ProductDetailClientProps {
   product: ShopifyProduct
@@ -12,6 +14,29 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const price = `$${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}`
   const images = product.images.edges.map(edge => ({ url: edge.node.url }))
+
+  const addItem = useCartStore(state => state.addItem)
+  const isLoading = useCartStore(state => state.isLoading)
+  const [justAdded, setJustAdded] = useState(false)
+
+  const handleAddToCart = async () => {
+    try {
+      // Get the first variant (default variant)
+      const variantId = product.variants.edges[0].node.id
+
+      // Add to cart
+      await addItem(variantId, 1)
+
+      // Show success feedback
+      setJustAdded(true)
+      setTimeout(() => setJustAdded(false), 2000)
+
+      console.log('✅ Added to cart:', product.title)
+    } catch (error) {
+      console.error('❌ Failed to add to cart:', error)
+      alert('Failed to add to cart. Please try again.')
+    }
+  }
 
   return (
     <main className="min-h-screen py-10 px-4 md:px-20 lg:px-40 flex items-center justify-center">
@@ -39,8 +64,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 />
               </div>
             )}
-            <Button className="px-4 py-6 text-base" >
-              Add to Cart
+            <Button
+              className="px-4 py-6 text-base"
+              onClick={handleAddToCart}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Adding...' : justAdded ? 'Added!' : 'Add to Cart'}
             </Button>
           </div>
         </motion.div>

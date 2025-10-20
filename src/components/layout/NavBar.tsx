@@ -21,10 +21,14 @@ import { ChevronDown, ShoppingCart, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
+import { useCartStore } from "@/store/cartStore"
+import { CartDrawer } from "@/components/cart"
 
 export default function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const cart = useCartStore(state => state.cart)
 
   useEffect(() => {
     // Check auth state on mount and when storage changes
@@ -109,8 +113,17 @@ export default function NavBar() {
       {/* Right side: Actions */}
       <div className="flex items-center space-x-2 md:space-x-4">
         {/* Cart */}
-        <button className="p-2 hover:text-primary transition-colors">
+        <button
+          className="p-2 hover:text-primary transition-colors relative"
+          onClick={() => setIsCartOpen(true)}
+          aria-label="Open shopping cart"
+        >
           <ShoppingCart className="h-5 w-5" />
+          {cart && cart.totalQuantity > 0 && (
+            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+              {cart.totalQuantity}
+            </span>
+          )}
         </button>
         
         {/* Auth Button - Hidden on mobile */}
@@ -257,6 +270,9 @@ export default function NavBar() {
           </SheetContent>
         </Sheet>
       </div>
+
+      {/* Cart Drawer */}
+      <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
     </nav>
   )
 }
