@@ -1,6 +1,6 @@
 import { getProductsByHandle } from "@/lib/shopify"
 import { notFound } from "next/navigation"
-import ProductDetailClient from "./ProductDetailClient"
+import { ProductDetailClient } from "@/components/products"
 import { Metadata } from "next"
 
 interface ProductPageProps {

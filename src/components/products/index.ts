@@ -1,6 +1,7 @@
 export { default as ProductCard } from './ProductCard'
 export { default as ProductGrid } from './ProductGrid'
 export { default as ProductDisplayClient } from './ProductDisplayClient'
+export { default as ProductDetailClient } from './ProductDetailClient'
 export { default as HorizontalProductScroll } from './HorizontalProductScroll'
 export { default as CategoryFilterButtons } from './CategoryFilterButtons'
 export { default as AudioPlayer } from './AudioPlayer'
