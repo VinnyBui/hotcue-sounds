@@ -1,5 +1,6 @@
 import { getProductsByCollection, ShopifyProduct } from "@/lib/shopify"
 import { ProductGrid } from "@/components/products"
+import { Metadata } from "next"
 
 interface CollectionPageProps {
   params: {
@@ -22,6 +23,17 @@ const collectionDescriptions: Record<string, string> = {
   bass: "Bass House and Drum & Bass sounds",
   breaks: "Breakbeat, drum breaks, and percussion",
   fx: "Sound effects, risers, impacts, and transitions"
+}
+
+export async function generateMetadata({ params }: CollectionPageProps): Promise<Metadata> {
+  const { handle } = await params
+  const collectionName = collectionNames[handle] || handle.charAt(0).toUpperCase() + handle.slice(1)
+  const collectionDescription = collectionDescriptions[handle] || `Browse ${collectionName} products`
+
+  return {
+    title: `${collectionName} - HotCue Sounds`,
+    description: collectionDescription,
+  }
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {

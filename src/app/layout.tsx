@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { NavBar } from "@/components/layout"
+import { NavBar, Footer } from "@/components/layout"
 import "@/styles/globals.css"
 import { ThemeProviderWrapper } from "@/components/providers"
 
@@ -18,7 +18,8 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-background text-foreground transition-all duration-300">
         <ThemeProviderWrapper>
           <NavBar />
-          {children}
+          <main className="flex-1">{children}</main>
+          <Footer />
         </ThemeProviderWrapper>
       </body>
     </html>

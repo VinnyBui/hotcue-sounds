@@ -1,5 +1,11 @@
 import { getProducts } from "@/lib/shopify"
 import { ProductGrid } from "@/components/products"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Sound Packs - HotCue Sounds",
+  description: "Browse our complete collection of professional sound packs for DJs",
+}
 
 export default async function ProductsPage() {
   const products = await getProducts(50) // Get up to 50 products
