@@ -147,20 +147,6 @@ export default function AccountPage() {
                   <p className="text-sm font-medium text-muted-foreground">Email</p>
                   <p className="text-base">{customer.email}</p>
                 </div>
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Phone</p>
-                  <p className="text-base">{customer.phone || "Not provided"}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Marketing Emails
-                  </p>
-                  <p className="text-base">
-                    {customer.acceptsMarketing ? "Subscribed" : "Not subscribed"}
-                  </p>
-                </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
