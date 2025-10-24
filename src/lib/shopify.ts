@@ -140,6 +140,47 @@ export interface CartUserError {
   message: string
 }
 
+// ===== ORDER TYPES =====
+
+export interface OrderLineItem {
+  title: string
+  quantity: number
+  originalTotalPrice: {
+    amount: string
+    currencyCode: string
+  }
+  variant?: {
+    id: string
+    title: string
+    image?: {
+      url: string
+      altText: string | null
+    }
+    product: {
+      id: string
+      handle: string
+      title: string
+    }
+  }
+}
+
+export interface ShopifyOrder {
+  id: string
+  orderNumber: number
+  processedAt: string
+  financialStatus: string
+  fulfillmentStatus: string
+  totalPrice: {
+    amount: string
+    currencyCode: string
+  }
+  lineItems: {
+    edges: Array<{
+      node: OrderLineItem
+    }>
+  }
+}
+
 // ===== PRODUCT FUNCTIONS =====
 
 export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]> {
@@ -708,4 +749,67 @@ export async function removeFromCart(
   }
 
   return data.cartLinesRemove.cart
+}
+
+// ===== ORDER FUNCTIONS =====
+
+export async function getCustomerOrders(
+  customerAccessToken: string,
+  first: number = 10
+): Promise<ShopifyOrder[]> {
+  const query = `
+    query getCustomerOrders($customerAccessToken: String!, $first: Int!) {
+      customer(customerAccessToken: $customerAccessToken) {
+        orders(first: $first, sortKey: PROCESSED_AT, reverse: true) {
+          edges {
+            node {
+              id
+              orderNumber
+              processedAt
+              financialStatus
+              fulfillmentStatus
+              totalPrice {
+                amount
+                currencyCode
+              }
+              lineItems(first: 50) {
+                edges {
+                  node {
+                    title
+                    quantity
+                    originalTotalPrice {
+                      amount
+                      currencyCode
+                    }
+                    variant {
+                      id
+                      title
+                      image {
+                        url
+                        altText
+                      }
+                      product {
+                        id
+                        handle
+                        title
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+
+  const data = await shopifyFetch(query, { customerAccessToken, first })
+
+  // If customer doesn't exist or token is invalid
+  if (!data.customer) {
+    return []
+  }
+
+  return data.customer.orders.edges.map((edge: any) => edge.node)
 }
