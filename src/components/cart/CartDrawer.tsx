@@ -157,11 +157,9 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             >
               Checkout
             </Button>
-            {customerEmail && (
-              <p className="text-xs text-muted-foreground text-center">
-                Checking out as: <span className="font-medium">{customerEmail}</span>
-              </p>
-            )}
+            <p className=" text-muted-foreground text-center">
+              Use code <strong className="text-white">PORTFOLIOFREE</strong> for 100% off at checkout!
+            </p>
             <p className="text-xs text-muted-foreground text-center">
               Secure checkout powered by Shopify
             </p>
