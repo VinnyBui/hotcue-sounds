@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { loginCustomer } from "@/lib/shopify-auth"
 import { Button } from "@/components/ui/button"
@@ -18,10 +18,20 @@ import {
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [returnUrl, setReturnUrl] = useState<string>("/account")
+
+  useEffect(() => {
+    // Get return URL from query params
+    const url = searchParams.get('returnUrl')
+    if (url) {
+      setReturnUrl(decodeURIComponent(url))
+    }
+  }, [searchParams])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,8 +49,8 @@ export default function LoginPage() {
         // Notify NavBar of auth state change
         window.dispatchEvent(new Event("authStateChanged"))
 
-        // Redirect to account page
-        router.push("/account")
+        // Redirect to return URL or account page
+        router.push(returnUrl)
       } else if (result.errors) {
         setErrors(result.errors)
       }

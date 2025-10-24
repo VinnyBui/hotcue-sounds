@@ -1,5 +1,7 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,6 +12,7 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet"
 import { useCartStore } from "@/store/cartStore"
+import { getCustomer } from "@/lib/shopify-auth"
 import CartItem from "./CartItem"
 
 interface CartDrawerProps {
@@ -18,7 +21,27 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
+  const router = useRouter()
   const { cart, isLoading } = useCartStore()
+  const [customerEmail, setCustomerEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Check if customer is logged in and get their email
+    const checkAuth = async () => {
+      const token = localStorage.getItem('shopify_access_token')
+      if (token) {
+        try {
+          const result = await getCustomer(token)
+          if (result.success && result.customer) {
+            setCustomerEmail(result.customer.email)
+          }
+        } catch (error) {
+          console.error('Failed to get customer:', error)
+        }
+      }
+    }
+    checkAuth()
+  }, [])
 
   const formatPrice = (amount: string, currencyCode: string) => {
     const price = parseFloat(amount)
@@ -30,7 +53,15 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
 
   const handleCheckout = () => {
     if (cart?.checkoutUrl) {
-      window.location.href = cart.checkoutUrl
+      let checkoutUrl = cart.checkoutUrl
+
+      // If user is logged in, append their email to pre-fill checkout
+      if (customerEmail) {
+        const separator = checkoutUrl.includes('?') ? '&' : '?'
+        checkoutUrl = `${checkoutUrl}${separator}checkout[email]=${encodeURIComponent(customerEmail)}`
+      }
+
+      window.location.href = checkoutUrl
     }
   }
 
@@ -126,6 +157,11 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             >
               Checkout
             </Button>
+            {customerEmail && (
+              <p className="text-xs text-muted-foreground text-center">
+                Checking out as: <span className="font-medium">{customerEmail}</span>
+              </p>
+            )}
             <p className="text-xs text-muted-foreground text-center">
               Secure checkout powered by Shopify
             </p>
