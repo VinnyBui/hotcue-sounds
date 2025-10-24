@@ -14,13 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import Image from "next/image"
 import Link from "next/link"
 
 export default function AccountPage() {
@@ -131,29 +124,6 @@ export default function AccountPage() {
     })
   }
 
-  const formatPrice = (amount: string, currencyCode: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currencyCode,
-    }).format(parseFloat(amount))
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "paid":
-      case "fulfilled":
-        return "bg-green-500/10 text-green-700 dark:text-green-400"
-      case "pending":
-      case "unfulfilled":
-        return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
-      case "refunded":
-      case "canceled":
-        return "bg-red-500/10 text-red-700 dark:text-red-400"
-      default:
-        return "bg-gray-500/10 text-gray-700 dark:text-gray-400"
-    }
-  }
-
   return (
     <div className="min-h-[calc(100vh-100px)] px-4 py-8 md:px-20 lg:px-40">
       <div className="mx-auto max-w-7xl">
@@ -222,101 +192,55 @@ export default function AccountPage() {
                 </Link>
               </div>
             ) : (
-              <Accordion type="single" collapsible className="w-full">
+              <div className="space-y-3">
                 {orders.map((order) => (
-                  <AccordionItem key={order.id} value={order.id}>
-                    <AccordionTrigger className="hover:no-underline">
-                      <div className="flex flex-col md:flex-row md:items-center justify-between w-full pr-4 gap-2">
-                        <div className="flex flex-col items-start gap-1">
-                          <span className="font-semibold">
-                            Order #{order.orderNumber}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            {formatDate(order.processedAt)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`px-2 py-1 rounded-md text-xs font-medium ${getStatusColor(
-                              order.fulfillmentStatus
-                            )}`}
-                          >
-                            {order.fulfillmentStatus || "Unfulfilled"}
-                          </span>
-                          <span className="font-semibold">
-                            {formatPrice(
-                              order.totalPrice.amount,
-                              order.totalPrice.currencyCode
-                            )}
-                          </span>
-                        </div>
+                  <div
+                    key={order.id}
+                    className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <p className="font-semibold">Order #{order.orderNumber}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatDate(order.processedAt)}
+                        </p>
                       </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-4 pt-4">
-                        {order.lineItems.edges.map(({ node: item }) => (
-                          <div
-                            key={item.variant?.id || item.title}
-                            className="flex gap-4 border-b pb-4 last:border-0"
-                          >
-                            {item.variant?.image && (
-                              <div className="relative h-16 w-16 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
-                                <Image
-                                  src={item.variant.image.url}
-                                  alt={
-                                    item.variant.image.altText || item.title
-                                  }
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
+                    </div>
+
+                    {/* Product Downloads */}
+                    <div className="space-y-2">
+                      {order.lineItems.edges.map(({ node: item }) => {
+                        const audioUrl = item.variant?.product?.audioPreviewUrl
+                        const productTitle = item.variant?.product?.title || item.title
+                        // Create filename from product title
+                        const filename = `${productTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.wav`
+                        // Create download URL through our API route
+                        const downloadUrl = audioUrl
+                          ? `/api/download?url=${encodeURIComponent(audioUrl)}&filename=${encodeURIComponent(filename)}`
+                          : null
+
+                        return (
+                          <div key={item.variant?.id || item.title} className="flex items-center justify-between gap-3 p-2 bg-accent/30 rounded">
+                            <p className="font-medium text-sm">{productTitle}</p>
+                            {downloadUrl ? (
+                              <a
+                                href={downloadUrl}
+                                className="shrink-0"
+                              >
+                                <Button size="sm" variant="outline">
+                                  Download
+                                </Button>
+                              </a>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">No download available</span>
                             )}
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate">
-                                {item.title}
-                              </p>
-                              {item.variant?.title &&
-                                item.variant.title !== "Default Title" && (
-                                  <p className="text-sm text-muted-foreground">
-                                    {item.variant.title}
-                                  </p>
-                                )}
-                              <p className="text-sm text-muted-foreground">
-                                Qty: {item.quantity}
-                              </p>
-                            </div>
-                            <div className="text-right flex-shrink-0">
-                              <p className="font-medium">
-                                {formatPrice(
-                                  item.originalTotalPrice.amount,
-                                  item.originalTotalPrice.currencyCode
-                                )}
-                              </p>
-                              {item.variant?.product && (
-                                <Link
-                                  href={`/products/${item.variant.product.handle}`}
-                                  className="text-sm text-blue-600 hover:underline"
-                                >
-                                  View Product
-                                </Link>
-                              )}
-                            </div>
                           </div>
-                        ))}
-                        <div className="flex justify-between items-center pt-2 border-t">
-                          <span className="font-medium">Total</span>
-                          <span className="font-bold text-lg">
-                            {formatPrice(
-                              order.totalPrice.amount,
-                              order.totalPrice.currencyCode
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
+                        )
+                      })}
+                    </div>
+                  </div>
                 ))}
-              </Accordion>
+              </div>
             )}
           </CardContent>
         </Card>

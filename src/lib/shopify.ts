@@ -160,6 +160,7 @@ export interface OrderLineItem {
       id: string
       handle: string
       title: string
+      audioPreviewUrl?: string
     }
   }
 }
@@ -792,6 +793,13 @@ export async function getCustomerOrders(
                         id
                         handle
                         title
+                        previewAudio: metafield(namespace: "custom", key: "preview_audio_url") {
+                          reference {
+                            ... on GenericFile {
+                              url
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -811,5 +819,21 @@ export async function getCustomerOrders(
     return []
   }
 
-  return data.customer.orders.edges.map((edge: any) => edge.node)
+  return data.customer.orders.edges.map((edge: any) => ({
+    ...edge.node,
+    lineItems: {
+      edges: edge.node.lineItems.edges.map((lineEdge: any) => ({
+        node: {
+          ...lineEdge.node,
+          variant: lineEdge.node.variant ? {
+            ...lineEdge.node.variant,
+            product: {
+              ...lineEdge.node.variant.product,
+              audioPreviewUrl: lineEdge.node.variant.product.previewAudio?.reference?.url
+            }
+          } : undefined
+        }
+      }))
+    }
+  }))
 }
