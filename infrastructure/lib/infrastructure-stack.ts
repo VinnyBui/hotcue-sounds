@@ -4,99 +4,95 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as apigateway from 'aws-cdk-lib/aws-apigatewayv2';
-import * as apigatewayIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 
 export class InfrastructureStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // S3 Bucket to host the static website
-    const websiteBucket = new s3.Bucket(this, 'HotCueBucket'  , {
-      websiteIndexDocument: 'index.html',
-      bucketName: 'hotcue-sounds-website',
-      publicReadAccess: true, 
-      blockPublicAccess: new s3.BlockPublicAccess({
-        blockPublicAcls: false,
-        blockPublicPolicy: false,
-        ignorePublicAcls: false,
-        restrictPublicBuckets: false,
-      }),
-      removalPolicy: cdk.RemovalPolicy.DESTROY, // Switch to retain if its need to be preserved
-      autoDeleteObjects: true, // Automatically delete objects when the bucket is destroyed
+    // S3 Bucket for static assets only (private, accessed via CloudFront OAC)
+    const assetsBucket = new s3.Bucket(this, 'HotCueAssetsBucket', {
+      bucketName: 'hotcue-sounds-assets',
+      publicReadAccess: false,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
     });
 
 
-    // Lambda Function to handle backend logic
-    const apiFunction = new lambda.Function(this, 'ApiFunction', {
+    // Lambda Function to handle SSR (Server-Side Rendering)
+    const ssrFunction = new lambda.Function(this, 'SSRFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
-      code: lambda.Code.fromAsset('../.open-next/server-functions/default'), // Path to Lambda function code
+      code: lambda.Code.fromAsset('../.open-next/server-functions/default'),
       timeout: cdk.Duration.seconds(30),
       memorySize: 1024,
       environment: {
         NODE_ENV: 'production',
-        // Add your Shopify credentials here:
-        SHOPIFY_STOREFRONT_ACCESS_TOKEN: '',
-        SHOPIFY_STORE_DOMAIN: '',
-      },  
-    });
-
-    // API Gateway to expose the Lambda function
-    const httpApi = new apigateway.HttpApi(this, 'HttpApi', {
-      apiName: 'HotCueApi',
-      description: 'API for HotCue Sounds',
-      corsPreflight: {
-        allowOrigins: ['*'],
-        allowMethods: [
-          apigateway.CorsHttpMethod.GET,
-          apigateway.CorsHttpMethod.POST,
-          apigateway.CorsHttpMethod.PUT,
-          apigateway.CorsHttpMethod.DELETE,
-          apigateway.CorsHttpMethod.OPTIONS,
-        ],
-        allowHeaders: ['*'],
+        // TODO: Add your Shopify credentials here before deploying:
+        // NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN: 'your-token-here',
+        // NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: 'hotcue-sounds.myshopify.com',
       },
-    });  
-
-    // Connect API Gateway to Lambda
-    httpApi.addRoutes({
-      path: '/api/{proxy+}',  // Matches /api/anything
-      methods: [apigateway.HttpMethod.ANY],
-      integration: new apigatewayIntegrations.HttpLambdaIntegration(
-        'ApiIntegration',
-        apiFunction
-      ),
     });
-    
-    // CloudFront Distribution to serve the website (Content Delivery Network)
+
+    // Create Lambda Function URL for CloudFront to access the SSR handler
+    const functionUrl = ssrFunction.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins: ['*'],
+        allowedMethods: [lambda.HttpMethod.ALL],
+        allowedHeaders: ['*'],
+      },
+    });
+
+    // Extract hostname from Function URL for CloudFront origin
+    const functionUrlHostname = cdk.Fn.select(2, cdk.Fn.split('/', functionUrl.url));
+
+    // CloudFront Distribution - Routes requests to Lambda (SSR) or S3 (static assets)
     const distribution = new cloudfront.Distribution(this, 'HotCueDistribution', {
+      // Default behavior: ALL requests go to Lambda for server-side rendering
       defaultBehavior: {
-        origin: new origins.S3StaticWebsiteOrigin(websiteBucket), // Fetch from this bucket if not cached
-        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS, // Force HTTPS connections
-        cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED, // cached for 24 hours
+        origin: new origins.HttpOrigin(functionUrlHostname, {
+          protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+        }),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED, // Don't cache SSR pages
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
       },
+      // Static assets behaviors: Route to S3 for caching
       additionalBehaviors: {
-        '/api/*': {
-          origin: new origins.HttpOrigin(`${httpApi.apiId}.execute-api.${this.region}.amazonaws.com`,),
+        '_next/*': {
+          origin: origins.S3BucketOrigin.withOriginAccessControl(assetsBucket),
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-          cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED, // Do not cache API responses
-          allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+          cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
         },
-      },  
-      defaultRootObject: 'index.html',
+        'favicon.ico': {
+          origin: origins.S3BucketOrigin.withOriginAccessControl(assetsBucket),
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        },
+        'images/*': {
+          origin: origins.S3BucketOrigin.withOriginAccessControl(assetsBucket),
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        },
+        'BUILD_ID': {
+          origin: origins.S3BucketOrigin.withOriginAccessControl(assetsBucket),
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        },
+      },
     });
 
-    // 5. DEPLOY STATIC ASSETS TO S3
+    // Deploy static assets to S3
     new s3deploy.BucketDeployment(this, 'DeployStaticAssets', {
       sources: [
-        s3deploy.Source.asset('../.open-next/assets'),  // Static files
-        s3deploy.Source.asset('../public'),              // Public folder
+        s3deploy.Source.asset('../.open-next/assets'), // OpenNext static files
       ],
-      destinationBucket: websiteBucket,
+      destinationBucket: assetsBucket,
       distribution: distribution,
-      distributionPaths: ['/*'], // Invalidate CloudFront cache
+      distributionPaths: ['/_next/*', '/favicon.ico', '/images/*', '/BUILD_ID'],
     });
 
     // Outputs - Shows URLs after deployment
@@ -105,14 +101,14 @@ export class InfrastructureStack extends cdk.Stack {
       description: 'CloudFront URL',
     });
 
-    new cdk.CfnOutput(this, 'BucketName', {
-      value: websiteBucket.bucketName,
-      description: 'S3 Bucket Name',
+    new cdk.CfnOutput(this, 'AssetsBucketName', {
+      value: assetsBucket.bucketName,
+      description: 'S3 Assets Bucket Name',
     });
 
-    new cdk.CfnOutput(this, 'ApiUrl', {
-      value: httpApi.url || 'API URL not available',
-      description: 'API Gateway URL',
+    new cdk.CfnOutput(this, 'SSRFunctionUrl', {
+      value: functionUrl.url,
+      description: 'Lambda Function URL (SSR Handler)',
     });
 
   }
