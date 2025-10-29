@@ -74,7 +74,7 @@ export async function loginCustomer(
       return {
         success: false,
         errors: data.customerAccessTokenCreate.customerUserErrors.map(
-          (error: any) => error.message
+          (error: { message: string }) => error.message
         ),
       }
     }
@@ -128,7 +128,7 @@ export async function logoutCustomer(
       return {
         success: false,
         errors: data.customerAccessTokenDelete.userErrors.map(
-          (error: any) => error.message
+          (error: { message: string }) => error.message
         ),
       }
     }
@@ -198,7 +198,7 @@ export async function createCustomer(
       return {
         success: false,
         errors: data.customerCreate.customerUserErrors.map(
-          (error: any) => error.message
+          (error: { message: string }) => error.message
         ),
       }
     }
@@ -308,7 +308,7 @@ export async function renewCustomerToken(
       return {
         success: false,
         errors: data.customerAccessTokenRenew.userErrors.map(
-          (error: any) => error.message
+          (error: { message: string }) => error.message
         ),
       }
     }

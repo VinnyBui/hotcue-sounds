@@ -1,5 +1,6 @@
 import { Music, Headphones, Zap, Target } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const metadata = {
   title: "About Us - HotCue Sounds",
@@ -28,13 +29,13 @@ export default function AboutPage() {
               <p>
                 At HotCue Sounds, we believe every DJ and producer deserves access to high-quality,
                 professional-grade audio tools that can take their performances to the next level.
-                Whether you're spinning at a club, producing in the studio, or streaming online,
+                Whether you&apos;re spinning at a club, producing in the studio, or streaming online,
                 our curated collection of hot cues, sound effects, and samples gives you the creative
                 edge you need.
               </p>
               <p>
-                We're passionate about electronic music and understand the importance of having the
-                right sounds at your fingertips. That's why every product in our catalog is carefully
+                We&apos;re passionate about electronic music and understand the importance of having the
+                right sounds at your fingertips. That&apos;s why every product in our catalog is carefully
                 selected and tested to ensure it meets the high standards of professional DJs and producers worldwide.
               </p>
             </CardContent>
@@ -57,7 +58,7 @@ export default function AboutPage() {
               <CardContent>
                 <p className="text-muted-foreground">
                   Genre-specific hot cues designed for seamless mixing. From house to techno,
-                  bass to breaks, we've got you covered with sounds that fit perfectly into your sets.
+                  bass to breaks, we&apos;ve got you covered with sounds that fit perfectly into your sets.
                 </p>
               </CardContent>
             </Card>
@@ -138,7 +139,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold text-lg mb-1">Genre-Specific</h3>
                   <p className="text-muted-foreground">
-                    Browse by genre to find exactly what fits your style - whether you're into house, techno, bass music, or breaks.
+                    Browse by genre to find exactly what fits your style - whether you&apos;re into house, techno, bass music, or breaks.
                   </p>
                 </div>
                 <div>
@@ -161,12 +162,12 @@ export default function AboutPage() {
                 Explore our collection and discover the sounds that will take your DJ performances
                 and productions to the next level.
               </p>
-              <a
+              <Link
                 href="/products"
                 className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Browse Sound Packs
-              </a>
+              </Link>
             </CardContent>
           </Card>
         </section>

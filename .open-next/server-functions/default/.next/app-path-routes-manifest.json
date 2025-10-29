@@ -1,0 +1,17 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/about/page": "/about",
+  "/account/page": "/account",
+  "/api/download/route": "/api/download",
+  "/api/products/route": "/api/products",
+  "/collections/[handle]/page": "/collections/[handle]",
+  "/contact/page": "/contact",
+  "/favicon.ico/route": "/favicon.ico",
+  "/legal/page": "/legal",
+  "/login/page": "/login",
+  "/page": "/",
+  "/products/[handle]/page": "/products/[handle]",
+  "/products/page": "/products",
+  "/signup/page": "/signup",
+  "/sitemap.xml/route": "/sitemap.xml"
+}

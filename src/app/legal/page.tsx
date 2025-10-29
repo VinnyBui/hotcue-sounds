@@ -1,4 +1,4 @@
-import { Scale, Shield } from "lucide-react"
+import React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const metadata = {
@@ -69,7 +69,7 @@ export default function LegalPage() {
               <div>
                 <h3 className="font-semibold text-foreground mb-2">5. Disclaimer</h3>
                 <p>
-                  The materials on HotCue Sounds are provided on an 'as is' basis. HotCue Sounds makes no warranties,
+                  The materials on HotCue Sounds are provided on an &apos;as is&apos; basis. HotCue Sounds makes no warranties,
                   expressed or implied, and hereby disclaims and negates all other warranties including, without limitation,
                   implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement
                   of intellectual property or other violation of rights.

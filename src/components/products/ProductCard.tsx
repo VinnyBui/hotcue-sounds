@@ -1,5 +1,6 @@
 "use client"
 
+import Image from 'next/image'
 import {Card, CardContent, CardFooter} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -87,11 +88,12 @@ export default function ProductCard({
   if (variant === 'detail') {
     return (
       <Card className="flex-shrink-0 p-0 max-w-[250px] max-h-[250px] md:max-w-[350px] md:max-h-[350px] bg-transparent border-2 border-border rounded-full">
-        <CardContent className="p-0 h-full">
-          <img
+        <CardContent className="p-0 h-full relative">
+          <Image
             src={displayImage}
             alt={title}
-            className="w-full h-full object-cover rounded-full"
+            fill
+            className="object-cover rounded-full"
           />
         </CardContent>
       </Card>
@@ -102,11 +104,12 @@ export default function ProductCard({
   if (variant === 'hero') {
     return (
       <Card className="flex-shrink-0 p-0 w-full h-full md:max-w-[250px] md:max-h-[250px] bg-transparent border-2 border-border rounded-full ">
-        <CardContent className="p-0 h-full">
-          <img
+        <CardContent className="p-0 h-full relative">
+          <Image
             src={displayImage}
             alt={title}
-            className="w-full h-full object-cover rounded-full"
+            fill
+            className="object-cover rounded-full"
           />
         </CardContent>
         <CardFooter className="p-0 font-semibold text-sm md:text-lg flex justify-center">
@@ -120,11 +123,12 @@ export default function ProductCard({
   const cardContent = (
     <Card className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all duration-300 ">
       <CardContent className="p-0 relative">
-        <div className="aspect-square overflow-hidden">
-          <img
+        <div className="aspect-square overflow-hidden relative">
+          <Image
             src={displayImage}
             alt={title}
-            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+            fill
+            className="object-cover hover:scale-110 transition-transform duration-300"
           />
         </div>
         {audioPreviewUrl && (

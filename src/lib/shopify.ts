@@ -1,6 +1,6 @@
 export async function shopifyFetch(
   query: string,
-  variables: Record<string, any> = {}
+  variables: Record<string, unknown> = {}
 ) {
   const endpoint = `https://${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN}/api/2023-10/graphql.json`
 
@@ -13,8 +13,8 @@ export async function shopifyFetch(
           process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN!,
       },
       body: JSON.stringify({ query, variables }),
-      // ensures fresh data in dev (disable caching)
-      next: { revalidate: 0 },
+      // Cache for 1 hour during build, revalidate in production
+      next: { revalidate: 3600 },
     })
 
     if (!res.ok) {
@@ -236,7 +236,7 @@ export async function getProducts(limit: number = 10): Promise<ShopifyProduct[]>
   `
 
   const data = await shopifyFetch(query, { limit })
-  return data.products.edges.map((edge: any) => ({
+  return data.products.edges.map((edge: { node: ShopifyProduct & { previewAudio?: { reference?: { url: string } } } }) => ({
     ...edge.node,
     audioPreviewUrl: edge.node.previewAudio?.reference?.url
   }))
@@ -302,7 +302,7 @@ export async function getProductsByCollection(collectionHandle: string, limit: n
     return []
   }
 
-  return data.collectionByHandle.products.edges.map((edge: any) => ({
+  return data.collectionByHandle.products.edges.map((edge: { node: ShopifyProduct & { previewAudio?: { reference?: { url: string } } } }) => ({
     ...edge.node,
     audioPreviewUrl: edge.node.previewAudio?.reference?.url
   }))
@@ -819,9 +819,11 @@ export async function getCustomerOrders(
     return []
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return data.customer.orders.edges.map((edge: any) => ({
     ...edge.node,
     lineItems: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       edges: edge.node.lineItems.edges.map((lineEdge: any) => ({
         node: {
           ...lineEdge.node,

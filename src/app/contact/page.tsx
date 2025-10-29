@@ -1,4 +1,3 @@
-import { Mail, MessageSquare } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Accordion,
@@ -20,7 +19,7 @@ export default function ContactPage() {
         <div className="text-center space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold">Support Hub</h1>
           <p className="text-muted-foreground text-lg">
-            Have questions? We're here to help!
+            Have questions? We&apos;re here to help!
           </p>
         </div>
 
@@ -85,7 +84,7 @@ export default function ContactPage() {
                 <AccordionItem value="item-2">
                   <AccordionTrigger>How do I download my purchase?</AccordionTrigger>
                   <AccordionContent>
-                    After completing your purchase, you'll receive an email with download links.
+                    After completing your purchase, you&apos;ll receive an email with download links.
                   </AccordionContent>
                 </AccordionItem>
 
@@ -99,14 +98,14 @@ export default function ContactPage() {
                 <AccordionItem value="item-4">
                   <AccordionTrigger>What is your refund policy?</AccordionTrigger>
                   <AccordionContent>
-                    Due to the digital nature of our products, we don't offer refunds.
+                    Due to the digital nature of our products, we don&apos;t offer refunds.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-5">
                   <AccordionTrigger>Do you offer custom sound design?</AccordionTrigger>
                   <AccordionContent>
-                    Yes! We offer custom sound design services. Please contact us at support@hotcuesounds.com with your project details and we'll provide a quote.
+                    Yes! We offer custom sound design services. Please contact us at support@hotcuesounds.com with your project details and we&apos;ll provide a quote.
                   </AccordionContent>
                 </AccordionItem>
 

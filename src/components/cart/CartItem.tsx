@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { Minus, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCartStore } from "@/store/cartStore"
@@ -89,11 +90,12 @@ export default function CartItem({ item }: CartItemProps) {
   return (
     <div className="flex gap-4 py-4 border-b border-border">
       {/* Product Image */}
-      <div className="flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-muted">
-        <img
+      <div className="flex-shrink-0 w-20 h-20 rounded-md overflow-hidden bg-muted relative">
+        <Image
           src={productImage}
           alt={item.merchandise.product.title}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
       </div>
 

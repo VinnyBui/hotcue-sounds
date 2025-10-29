@@ -74,7 +74,8 @@ export default function SignupPage() {
         // Account created but login failed - redirect to login page
         router.push("/login")
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("Signup error:", err)
       setErrors(["An unexpected error occurred. Please try again."])
     } finally {
       setIsLoading(false)

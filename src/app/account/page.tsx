@@ -58,7 +58,8 @@ export default function AccountPage() {
           localStorage.removeItem("shopify_token_expires")
           router.push("/login")
         }
-      } catch (error) {
+      } catch (err) {
+        console.error("Failed to load account data:", err)
         setError("Failed to load account data")
       } finally {
         setIsLoading(false)

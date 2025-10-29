@@ -27,7 +27,7 @@ export default function Error({
             Something Went Wrong
           </h2>
           <p className="text-lg text-muted-foreground">
-            The beat dropped... literally. We encountered an unexpected error. Don't worry, our team has been notified.
+            The beat dropped... literally. We encountered an unexpected error. Don&apos;t worry, our team has been notified.
           </p>
           {error.digest && (
             <p className="text-sm text-muted-foreground font-mono">
