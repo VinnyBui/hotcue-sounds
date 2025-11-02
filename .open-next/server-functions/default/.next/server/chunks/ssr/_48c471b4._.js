@@ -12,7 +12,7 @@ module.exports=[61899,a=>{"use strict";async function b(b,c){let d=`
         }
       }
     } 
-  `;try{let{shopifyFetch:e}=await a.A(39599),f=await e(d,{input:{email:b,password:c}});if(f.customerAccessTokenCreate.customerUserErrors.length>0)return{success:!1,errors:f.customerAccessTokenCreate.customerUserErrors.map(a=>a.message)};return{success:!0,accessToken:f.customerAccessTokenCreate.customerAccessToken}}catch(a){return console.error("Login customer failed:",a),{success:!1,errors:["Login failed. Please check your credentials"]}}}async function c(b){let c=`
+  `;try{let{shopifyFetch:e}=await a.A(39599),f=await e(d,{input:{email:b,password:c}});if(f.customerAccessTokenCreate.customerUserErrors.length>0){let a=f.customerAccessTokenCreate.customerUserErrors.map(a=>a.message.toLowerCase().includes("unidentified")?"Invalid email or password. Please try again.":a.message);return{success:!1,errors:a}}return{success:!0,accessToken:f.customerAccessTokenCreate.customerAccessToken}}catch(a){return console.error("Login customer failed:",a),{success:!1,errors:["Login failed. Please check your credentials"]}}}async function c(b){let c=`
     mutation customerAccessTokenDelete($customerAccessToken: String!) {
       customerAccessTokenDelete(customerAccessToken: $customerAccessToken) {
         deletedAccessToken

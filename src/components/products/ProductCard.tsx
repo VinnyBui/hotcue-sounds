@@ -87,8 +87,8 @@ export default function ProductCard({
   // Detail variant (used in product detail page - circular without footer)
   if (variant === 'detail') {
     return (
-      <Card className="flex-shrink-0 p-0 max-w-[250px] max-h-[250px] md:max-w-[350px] md:max-h-[350px] bg-transparent border-2 border-border rounded-full">
-        <CardContent className="p-0 h-full relative">
+      <Card className="flex-shrink-0 p-0 w-[250px] h-[250px] md:w-[350px] md:h-[350px] bg-transparent border-2 border-border rounded-full">
+        <CardContent className="p-0 w-full h-full relative">
           <Image
             src={displayImage}
             alt={title}
@@ -103,7 +103,7 @@ export default function ProductCard({
   // Hero variant (used in HeroSection with 3D perspective)
   if (variant === 'hero') {
     return (
-      <Card className="flex-shrink-0 p-0 w-full h-full md:max-w-[250px] md:max-h-[250px] bg-transparent border-2 border-border rounded-full ">
+      <Card className="flex-shrink-0 p-5 w-full h-full md:w-[300px] md:h-[300px] bg-transparent border-2 border-border rounded-full ">
         <CardContent className="p-0 h-full relative">
           <Image
             src={displayImage}
