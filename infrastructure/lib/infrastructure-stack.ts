@@ -6,6 +6,7 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 
 export class InfrastructureStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -100,8 +101,18 @@ export class InfrastructureStack extends cdk.Stack {
       enableAcceptEncodingBrotli: true,
     });
 
+    // Import SSL Certificate from ACM (must be in us-east-1 for CloudFront)
+    const certificate = acm.Certificate.fromCertificateArn(
+      this,
+      'SslCertificate',
+      'arn:aws:acm:us-east-1:436629683648:certificate/4399c531-caa6-4e56-a4be-eca7b3ac0c8c'
+    );
+
     // CloudFront Distribution - Routes requests to Lambda (SSR) or S3 (static assets)
     const distribution = new cloudfront.Distribution(this, 'HotCueDistribution', {
+      // Custom domain configuration
+      domainNames: ['hotcuesounds.com', 'www.hotcuesounds.com'],
+      certificate: certificate,
       // Default behavior: ALL requests go to Lambda for server-side rendering
       defaultBehavior: {
         origin: new origins.HttpOrigin(functionUrlHostname, {
@@ -157,30 +168,35 @@ export class InfrastructureStack extends cdk.Stack {
     });
 
     // Outputs - Shows URLs after deployment
-    new cdk.CfnOutput(this, 'DistributionUrl', {
-      value: `https://${distribution.distributionDomainName}`,
-      description: 'CloudFront URL',
-    });
+    // new cdk.CfnOutput(this, 'DistributionUrl', {
+    //   value: `https://${distribution.distributionDomainName}`,
+    //   description: 'CloudFront URL',
+    // });
 
-    new cdk.CfnOutput(this, 'AssetsBucketName', {
-      value: assetsBucket.bucketName,
-      description: 'S3 Assets Bucket Name',
-    });
+    // new cdk.CfnOutput(this, 'AssetsBucketName', {
+    //   value: assetsBucket.bucketName,
+    //   description: 'S3 Assets Bucket Name',
+    // });
 
-    new cdk.CfnOutput(this, 'SSRFunctionUrl', {
-      value: functionUrl.url,
-      description: 'Lambda Function URL (SSR Handler)',
-    });
+    // new cdk.CfnOutput(this, 'SSRFunctionUrl', {
+    //   value: functionUrl.url,
+    //   description: 'Lambda Function URL (SSR Handler)',
+    // });
 
-    new cdk.CfnOutput(this, 'ShopifySecretArn', {
-      value: shopifySecret.secretArn,
-      description: 'Shopify Credentials Secret ARN (update values in AWS Console)',
-    });
+    // new cdk.CfnOutput(this, 'ShopifySecretArn', {
+    //   value: shopifySecret.secretArn,
+    //   description: 'Shopify Credentials Secret ARN (update values in AWS Console)',
+    // });
 
-    new cdk.CfnOutput(this, 'ImageOptFunctionUrl', {
-      value: imageOptUrl.url,
-      description: 'Image Optimization Function URL',
-    });
+    // new cdk.CfnOutput(this, 'ImageOptFunctionUrl', {
+    //   value: imageOptUrl.url,
+    //   description: 'Image Optimization Function URL',
+    // });
+
+    // new cdk.CfnOutput(this, 'CustomDomainUrls', {
+    //   value: 'https://hotcuesounds.com and https://www.hotcuesounds.com',
+    //   description: 'Custom domain URLs (configure DNS A records in Route 53 to point to CloudFront)',
+    // });
 
   }
 }
