@@ -71,11 +71,21 @@ export async function loginCustomer(
 
     // Step 4: Check if there are errors
     if (data.customerAccessTokenCreate.customerUserErrors.length > 0) {
+      // Map Shopify's error messages to user-friendly versions
+      const userFriendlyErrors = data.customerAccessTokenCreate.customerUserErrors.map(
+        (error: CustomerUserError) => {
+          // Shopify returns "Unidentified customer" for wrong email/password
+          if (error.message.toLowerCase().includes('unidentified')) {
+            return 'Invalid email or password. Please try again.'
+          }
+          // Return original message for other errors
+          return error.message
+        }
+      )
+
       return {
         success: false,
-        errors: data.customerAccessTokenCreate.customerUserErrors.map(
-          (error: { message: string }) => error.message
-        ),
+        errors: userFriendlyErrors,
       }
     }
     // Step 5: Return the access token
