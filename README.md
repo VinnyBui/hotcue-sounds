@@ -54,7 +54,8 @@ Overall, HotCue Sounds serves as both a learning experience and a proof of conce
 The site uses a Shopify development store. To test the full checkout experience:
 - Browse products and add items to cart
 - When prompted at checkout, use password: `hotcue`
-
+- You can use a fake or real payment method, the transaction won't appear in your payment history because shopify site is still in development. All transactions are just for testing purposes
+- Once purchase, you can see the audio file in your email or in your account page 
 
 ---
 ## Key Features
