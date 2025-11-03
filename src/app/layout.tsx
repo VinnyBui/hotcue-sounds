@@ -1,7 +1,20 @@
 import type { Metadata } from "next"
+import { Space_Grotesk, Inter } from "next/font/google"
 import { NavBar, Footer } from "@/components/layout"
 import "@/styles/globals.css"
 import { ThemeProviderWrapper } from "@/components/providers"
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+})
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "HotCue Sounds",
@@ -15,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-background text-foreground transition-all duration-300">
+      <body className={`${inter.variable} ${spaceGrotesk.variable} min-h-screen flex flex-col bg-background text-foreground transition-all duration-300`}>
         <ThemeProviderWrapper>
           <NavBar />
           <main className="flex-1">{children}</main>
